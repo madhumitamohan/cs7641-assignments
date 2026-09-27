@@ -1,0 +1,77 @@
+\section*{Appendix}
+The appendix will include any information that is extraneous to the questions asked, but still informative. This content is not necessary for the homework, only if you're curious about further math.
+
+\subsection{KKT Explanation}
+In KKT, we have an objective function $f$ and a set of inequality constraints $g_i$. KKT defines a framework for solving such problems by converting them to systems of equations. We'll go through a simple example.
+\begin{align*}
+    \min_{x} \qquad & f(x) = x^2-4x \\
+    \text{s.t.} \qquad & g_{1}(x): x + 2 \geq 0
+\end{align*}
+First, we need to define our Lagrangian. The general form is:
+$$\mathcal{L}(\vec{x};\vec{\lambda}) = f(\vec{x}) \pm \sum_i \lambda_ig_i$$
+Where $\lambda_i$ are non-negative multipliers for each constraint. You'll notice a $\pm$ in that formula. This is variant because your constraints could be $g\geq 0$ or $g\leq 0$ and you could be maximizing or minimizing. The way to think about determining the sign is to interpret a solution to the system. A solution would have the direction of improvement for $f$ pointing outside of the feasible region, that is, the best way to improve $f$ would have us walking into a point where some $g_i$ is dissatisfied.
+
+If we're minimizing, the direction of improvement for $f$ is $-\nabla f$; if we're maximizing, the direction of improvement for $f$ is $\nabla f$. If the constraints are non-negative, the direction of infeasibility is $-\sum\nabla g$; if the constraints are non-positive, the direction of infeasibility is $\sum\nabla g$. You simply set them equal.
+$$\begin{tabular}{|c|c|c|}\hline
+    Optimization & Constraints & Solution Condition \\\hline\hline
+    $\min f$ & $g\geq 0$ & $-\nabla f =-\sum\lambda\nabla g$ \\
+    Improvement: $-\nabla f$ & Infeasibility: $-\sum\lambda\nabla g$ &  \\\hline
+    $\min f$ & $g\leq 0$ & $-\nabla f =\sum\lambda\nabla g$ \\
+    Improvement: $-\nabla f$ & Infeasibility: $\sum\lambda\nabla g$ &  \\\hline
+    $\max f$ & $g\geq 0$ & $\nabla f =-\sum\lambda\nabla g$ \\
+    Improvement: $\nabla f$ & Infeasibility: $-\sum\lambda\nabla g$ &  \\\hline
+    $\max f$ & $g\leq 0$ & $\nabla f =\sum\lambda\nabla g$ \\
+    Improvement: $\nabla f$ & Infeasibility: $\sum\lambda\nabla g$ &  \\\hline
+\end{tabular}$$
+The point of the Lagrangian (even in normal equality Lagrange optimization) is to generate this condition! We'll take the gradient of the Lagrangian and set it to zero ($\nabla \mathcal{L}=\vec{0}$). We just need to formulate the Lagrangian so the solution condition would precipitate from the stationarity of the Lagrangian.
+$$\begin{tabular}{|c|c|c|}\hline
+    Optimization & Constraints & Lagrangian \\\hline\hline
+    $\min f$ & $g\geq 0$ & $f - \sum\lambda g$ \\\hline
+    $\min f$ & $g\leq 0$ & $f + \sum\lambda g$ \\\hline
+    $\max f$ & $g\geq 0$ & $f + \sum\lambda g$ \\\hline
+    $\max f$ & $g\leq 0$ & $f - \sum\lambda g$ \\\hline
+\end{tabular}$$
+
+
+Thus, for our problem, we'll have a negative sign, since we have $\min f$ and $g\geq 0$.
+$$\mathcal{L}(x;\lambda_1) = x^2-4x - \lambda_1(x+2)$$
+
+Then, we enumerate the KKT conditions:
+\begin{enumerate}
+    \item Stationarity: a candidate point can't have a feasible improvement in a neighborhood around it
+
+    $$\nabla \mathcal{L} = \vec{0}$$
+
+    \item Primal Feasibility: a candidate point must obey the constraints
+
+    $$\forall i [g_i]$$
+
+    \item Dual Feasibility: a candidate point must have non-negative multipliers
+
+    $$\forall i[\lambda_i \geq 0]$$
+
+    \item Complementary Slackness: a candidate point must either be on the constraint boundary or its multiplier be inactive
+
+    $$\forall i [\lambda_ig_i=0]$$
+\end{enumerate}
+We simply need to find candidates which satisfy all of these conditions, then find the smallest point among the candidates. I'll show the solution procedure for our example problem. First, list the KKT conditions:
+\begin{enumerate}
+    \item Stationarity:
+    $$\frac{d\mathcal{L}}{dx} = 2x-4-\lambda_1 := 0$$
+    \item Primal Feasibility:
+    $$x+2\geq 0$$
+    \item Dual Feasibility:
+    $$\lambda_1 \geq 0$$
+    \item Complementary Slackness:
+    $$\lambda_1(x+2)=0$$
+\end{enumerate}
+The easiest way to make progress is to note that complementary slackness is like a Boolean or. $\lambda_1(x+2)=0 \longrightarrow (\lambda_1=0)\lor (x+2=0)$. We say a constraint is active when $g_i=0$ and we say that constraint is inactive when $\lambda_i=0$. You'll notice that this will explode into $2^{\text{number of constraints}}$ possible activity cases! Luckily, we only have 2 cases.\begin{itemize}
+    \item $g_1$ active
+
+    Then, $x+2=0$, so $x=-2$. Using stationarity, $2x-4-\lambda_1=0$, then $\lambda_1=-8$. However, $-8 \ngeq 0$, so this candidate breaks dual feasibility. Thus, this activity case yields no candidates.
+
+    \item $g_1$ inactive
+
+    Then, $\lambda_1=0$. Using stationarity, $2x-4-\lambda_1=0$, then $2x=4$, $x=2$. Since $\lambda_1=0$ and $0\geq0$, this candidate is dually feasible, and since $x+2=2+2=4\geq 0$, this candidate is primally feasible. Thus, this activity case yields a feasible candidate $x=2$.
+\end{itemize}
+That's all possible cases given just one constraint. We only have one feasible candidate, $x=2$. Normally, we'd do the candidate's test to find out the true minimum, but since we only have one candidate, we can conclude that $x=2$ is the minimum.

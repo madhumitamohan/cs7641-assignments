@@ -1,0 +1,84 @@
+\section{Linear Algebra [20pts]}
+
+
+
+\subsection{More General Inner Products [9pts]}
+In lecture, we will have discussed a lot of properties of the dot product on $\mathbb{R}^n$. The dot product is a prolific example of a more general operation: an \textbf{inner product}. There are many ways you could formulate an inner product on $\mathbb{R}^n$. An inner product is typically denoted as $\langle \cdot, \cdot\rangle$, and just needs to satisfy a number of axioms.\footnote{For $\mathbb{R}^n$, generally, we look for Symmetry ($\forall\vec{x},\vec{y};\;\; \langle \vec{x}, \vec{y}\rangle = \langle \vec{y}, \vec{x}\rangle$), Linearity in the First Argument ($\forall\vec{x},\vec{y},\vec{z},\alpha\in\mathbb{R},\beta\in\mathbb{R};\;\; \langle \alpha\vec{x} + \beta \vec{y}, \vec{z}\rangle = \alpha\langle \vec{x}, \vec{z}\rangle + \beta\langle \vec{y}, \vec{z}\rangle$), and Positive-Definiteness ($\forall\vec{x};\;\; \langle\vec{x}, \vec{x}\rangle = 0 \iff \vec{x} = \vec{0}$, and $\forall\vec{x};\;\; \langle \vec{x}, \vec{x} \rangle \geq 0$).}
+
+\smallskip Different inner products give us different conceptualizations of \textit{angles} between vectors. More specifically, a pair of vectors $\vec{x}, \vec{y}$ are said to be \textbf{orthogonal} if and only $\langle \vec{x}, \vec{y}\rangle = 0$. However, since the inner product is a broad category of functions, it is very possible for two vectors to be orthogonal with respect to some inner product not orthogonal with respect to another.
+
+\smallskip Consider the following vector.
+$$\vec{v}=\begin{bmatrix}1 \\ 1 \\ 3\end{bmatrix}$$
+For each of the following inner products, you must find the \emph{set of all vectors} orthogonal to $\vec{v}$ under that inner product. \emph{Show your work.} [3pts each]
+
+\begin{enumerate}[label=\alph*.]
+    \item $\langle (x_1, x_2, x_3), (y_1, y_2, y_3) \rangle_a \;\coloneq\; x_1y_1 + x_2y_2 + x_3y_3$ 
+    \item $\langle (x_1, x_2, x_3), (y_1, y_2, y_3) \rangle_b \coloneq 9x_1y_1 + 4x_2y_2 + x_3y_3$
+    \item $\langle (x_1, x_2, x_3), (y_1, y_2, y_3) \rangle_c \coloneq 6x_1y_1 - 2x_1y_2 - 2x_2y_1 + 3x_2y_2 + 3x_3y_3$
+\end{enumerate}
+
+\begin{hintbox}
+The set of vectors orthogonal to a given vector is likely to be infinite. In that case, you should parametrize your result. A standard format is set builder notation, which defines sets more generally:
+
+$$\left\{ \text{arbitrary formula to make an element} \;\Big|\; \text{rules for inclusion in the set}\right\}$$
+
+For example, to express the plane $z=0$ of $\mathbb{R}^3$ in set-builder notation, we could say:
+
+$$S = \left\{ a\begin{bmatrix}1 \\ 0 \\ 0\end{bmatrix} + b\begin{bmatrix}0 \\ 1 \\ 0\end{bmatrix} \;\Bigg|\; \forall a,b\in\mathbb{R}\right\}$$
+
+You do not need to use this particular notation. You may solve the question however you like, and you may express your answer however you like, but you must parametrize your result such that you appropriately express the set of all vectors orthogonal to $\vec{v}$.
+\end{hintbox}
+
+\newpage
+
+
+
+\subsection{More General Norms [6pts]}
+In lecture, we will have discussed a lot of properties of the $L_1$ and $L_2$ norms. You may have also heard those called Manhattan and Euclidean distance, respectively. These distance functions are prolific examples of a more general operation: a \textbf{norm}.
+
+Just like we can define any number of different inner products to explore different conceptualizations of \textit{vector angles}, we can also define new norms to explore different conceptualizations of \textit{vector distance/length}. A norm is any function that maps a vector space to the non-negative real numbers. However, recall from lecture that it must also satisfy three properties: positive-definiteness, absolute homogeneity, and triangle inequality/subadditivity (check the lecture slides for more precise formulations).
+
+Then, for each of the following functions: [2pts each]
+\begin{itemize}
+    \itemsep 0em
+    \item if they \textit{do not} constitute a valid norm, you may merely \emph{indicate} one property of norms they violate and provide an example input where the function violates that property.
+    \item if they \textit{do} constitute a valid norm, you must \emph{prove} that they satisfy all three properties of norms mentioned above.
+\end{itemize}
+
+\begin{enumerate}[label=\alph*.]
+    \item $f \colon \mathbb{R}^2 \to \mathbb{R}_{\ge 0}$ with
+        $$f((x_1, x_2)) = \biggl|\sin(x_1^2) + \frac{x_1 + 1}{\sqrt{3}} + 6x_1\biggr| + \biggl|\sin(x_2^2) + \frac{x_2 + 1}{\sqrt{3}} + 6x_2\biggr|$$
+    \item $g \colon \mathbb{R}^2 \to \mathbb{R}_{\ge 0}$ with
+        $$g((x_1, x_2)) = \sqrt{|x_1|^2 + |x_2|^{4}}$$
+    \item $h \colon \mathbb{R}^{3} \to \mathbb{R}_{\ge 0}$ with
+        $$h((x_1, x_2, x_3)) = |x_1| + 3|x_2| + 6|x_3|$$
+\end{enumerate}
+
+\begin{hintbox}
+Proving positive-definiteness, absolute homogeneity, and triangle inequality/subadditivity from scratch can be a bit tricky. It helps to work from existing functions that you already know are norms.
+
+\smallskip These functions all make use of the absolute value function $|x|$. You may safely assume that this is a valid norm on $\mathbb{R} \to \mathbb{R}_{\ge 0}$ (as though the input were a 1-D vector space). Thus, it will satisfy the three properties—positive-definiteness, absolute homogeneity, and triangle inequality/subadditivity. You may invoke this in your proofs as a given wherever necessary.
+\end{hintbox}
+\newpage
+
+
+
+\subsection{Eigen-stuff [6pts]}
+\begin{enumerate}[label=\alph*.]
+    \item Given the following matrix $\boldsymbol{A}$, solve for its eigenvalues ($\lambda_1, \lambda_2$) in terms of $a$, $b$, and $c$. \emph{Show your work.} [3pts]
+
+    $$\boldsymbol{A}=\begin{bmatrix}
+        a & b \\
+        b & c
+    \end{bmatrix}$$
+
+    \item Let $\boldsymbol{B}$ be a real-valued, symmetric, $3 \times 3$ matrix. $\vec{v}_1$ and $\vec{v}_2$ are eigenvectors of $\boldsymbol{B}$ that correspond to real, distinct eigenvalues $\lambda_1, \lambda_2$; they are as follows:
+    $$\vec{v}_1 = \begin{bmatrix}1 \\ 2 \\ 1\end{bmatrix} \qquad \vec{v}_2 = \begin{bmatrix}-2 \\ 1 \\ 0\end{bmatrix}$$
+    Suppose that $B$ has one more eigenvalue $\lambda_3$ that's different from the other 2. Find the third eigenvector, a non-zero vector $\vec{v}_3 \in \mathbb{R}^3$, such that $\boldsymbol{B}\vec{v}_3 = \lambda_3\vec{v}_3$, and $\lambda_3 \neq \lambda_2, \lambda_3 \neq \lambda_1$. \emph{Show your work.} [3pts]
+
+    \begin{hintbox}
+
+        This would be very difficult to deduce for a general matrix $\boldsymbol{B}$, but we have that $\boldsymbol{B}$ is a real-valued, symmetric matrix. What, then, can we conclude about its eigenvectors? (the answer is in the slides...)
+    \end{hintbox}
+\end{enumerate}
+\newpage

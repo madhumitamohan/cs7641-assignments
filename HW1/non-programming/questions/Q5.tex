@@ -1,0 +1,63 @@
+\section{Optimization [15pts + 6\% Bonus for All]}
+\subsection{KKT Conditions [15pts + 2\% Bonus for All]}
+Optimization problems are related to minimizing a function (usually termed loss, cost, or error function) or maximizing a function (such as the likelihood) with respect to some variable $x$. The Karush-Kuhn-Tucker (KKT) conditions are first-order conditions for a solution in nonlinear programming to be optimal, provided that some regularity conditions are satisfied. You will learn about the KKT procedure in class, but there is also an example problem in the appendix.
+
+In this question, you will be solving the following optimization problem:
+\begin{align*}
+    \min_{\vec{x} \in \mathbb{R}^3} \qquad & f(\vec{x}) = 3x_1^2 + 5x_2^2 - x_2x_3 + 2x_3^2, \qquad \vec{x} = (x_1,x_2,x_3) \\
+    \text{s.t.} \qquad & g_1(\vec{x}) : x_1 + x_2 + x_3 \leq -4 \\
+    & g_2(\vec{x}) : 4x_1^2 \leq 5 \\
+    & g_3(\vec{x}) : 3x_2 + 8x_1 \leq -50 \\
+    & g_4(\vec{x}) : -x_3^2 \leq -6 \\
+\end{align*}
+
+\begin{enumerate}[label=\alph*.]
+    \item Write the Lagrange function, $\mathcal{L}(\vec{x}; \lambda_1, \lambda_2, \lambda_3, \lambda_4)$ for this minimization problem. [3pts] % no work required
+
+    \item List the names of all 4 groups of KKT conditions and all their corresponding mathematical equations or inequalities for this specific minimization problem. \emph{Show your work.} [9pts]
+
+    \item Inequality constraints are tough to deal with. In addition to the Lagrange multipliers, KKT introduces the idea of constraint activity. When enumerating all possible constraint activity sets, how many systems would we need to solve? [3pts] % no work required
+
+    \item Find the constrained global minimum! This is quite a lot of work and we don't expect you to do it by hand; you may use any tool you like. Once you set activity, KKT reduces to a system of equalities (and you check the solutions for feasibility after solving), so any tool for solving equations would work.
+
+    \smallskip There are several capable python packages, including \link{https://docs.sympy.org/latest/modules/solvers/solvers.html}{SymPy} or \link{https://doc.sagemath.org/html/en/tutorial/tour_algebra.html#solving-equations-exactly}{sagemath}. There may be online tools, but those tend to be quite limited, especially in the number of variables allowed.
+
+    \smallskip List out all feasible candidates (including their Lagrange multipliers), then perform the candidates test to pick the optimal candidate. \emph{Round your final result to 3 decimal places.} [2\% Bonus for All]
+\end{enumerate}
+
+
+\newpage
+\subsection*{Example: Using Jensen's Inequality for Gibbs' Inequality [0pts]}
+Jensen's inequality is a very powerful tool in ML. In general,
+$$\begin{cases}
+    \mathbb{E}\left[f(X)\right] \geq f\left(\mathbb{E}[X]\right) & \text{ when f is convex} \\
+    \mathbb{E}\left[f(X)\right] \leq f\left(\mathbb{E}[X]\right) & \text{ when f is concave}
+\end{cases}$$
+Choosing the right composition function $f$ can generate very useful results. For example, one can use Jensen's inequality to prove Gibbs' inequality, that is, that KL-Divergence is non-negative. For discrete probability distributions $P$ and $Q$,
+$$ D_{\text{KL}}(P\|Q) = \sum_i p_i \log\frac{p_i}{q_i} $$
+We can express this as an expectation of $\log\frac{p_i}{q_i}$ over the weights $p_i$, which must sum to 1, as they're valid probabilities. For Jensen's we also need a convex function to get $D_{\text{KL}}\geq\cdots$ and not $D_{\text{KL}}\leq\cdots$; log is concave, but then $-\log$ is convex, and that's just a log rule away.
+$$ D_{\text{KL}}(P\|Q) = \sum_i p_i\cdot\left(\log\frac{p_i}{q_i}\right) = \mathbb{E}_p\left[\log\frac{p_i}{q_i}\right] = \mathbb{E}_p\left[-\log\frac{q_i}{p_i}\right] $$
+To appropriately apply Jensen's, we need to show that $-\log$ is convex. Briefly, $f(x)=-\log(x)$, $f'(x)=\frac{-1}{\ln(2)x}$, $f''(x)=\frac{1}{\ln(2)x^2}$. $x^2\geq 0$, so $\frac{1}{x^2}\geq 0$, so $\frac{1}{\ln(2)x^2} \geq 0$. Thus it's convex, so:
+$$ \mathbb{E}_p\left[-\log\frac{q_i}{p_i}\right] \geq -\log\left(\mathbb{E}_p\left[\frac{q_i}{p_i}\right]\right) $$
+$$ D_{\text{KL}}(P\|Q) = \mathbb{E}_p\left[-\log\frac{q_i}{p_i}\right] \geq -\log\left(\mathbb{E}_p\left[\frac{q_i}{p_i}\right]\right) = -\log\left(\sum_i p_i\cdot \frac{q_i}{p_i}\right) = -\log\left(\sum_i q_i\right) = -\log\left(1\right) = 0 $$
+$$ D_{\text{KL}}(P\|Q) \geq 0 $$
+Thus, we've shown it directly. $\square$
+
+\smallskip In other situations, this may not be how you utilize Jensen's. The formulation of KL-divergence lends itself nicely to direct application of Jensen's, but sometimes you may need to work backward, taking what you want to find and constructing an arbitrary set of inputs that will result in your target.
+
+
+\subsection{Using Jensen's for Convexity [4\% Bonus for All]}
+For a multivariate function $g:\mathbb{R}^n\rightarrow\mathbb{R}$, you can check its convexity by finding it's Hessian matrix. If the Hessian is positive semi-definite, then the function is convex. The Hessian is defined as:
+$$ \boldsymbol{H_g} = \nabla^2 g(x) = \begin{bmatrix}
+    \frac{\partial^2g}{\partial x_1^2} & \frac{\partial^2g}{\partial x_1\partial x_2} & \cdots \\
+    \frac{\partial^2g}{\partial x_2 \partial x_1} & \frac{\partial^2g}{\partial x_2^2} &  \\
+    \vdots &  & \ddots
+\end{bmatrix} $$
+Next, we can say a matrix is positive semi-definite if its quadratic form w.r.t. an \textbf{arbitrary} vector $\vec{d}\in\mathbb{R}^n$ is always non-negative:
+$$ \vec{d}^{\,\top} \boldsymbol{H_g} \vec{d} \overset{?}{\geq} 0 $$
+
+Consider the log-sum-exp function $f(x) = \ln(\sum_{i=1}^n e^{x_i})$. Using this process, \emph{prove} that $f$ is convex on $\mathbb{R}^n$, that is, that $\vec{d}^{\,\top} \boldsymbol{H_f} \vec{d} \geq 0$. There are many ways to prove this, but for this question, \textbf{\emph{you must use Jensen's inequality}} as the crux of your proof.
+
+\begin{hintbox}
+    Let $\phi(t) = t^2$. $\phi''(t)=2\geq 0$, so $\phi$ is convex. One possible solution path will use $\phi$ as the composition function for Jensen's.
+\end{hintbox}

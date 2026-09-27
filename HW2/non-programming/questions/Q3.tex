@@ -1,0 +1,17 @@
+\section{Numeric Stability [6pts]}
+In the Programming assignment (section 2.3), you should have implemented the helper functions for GMM. The notebook contains some information which may be useful in answering these questions.
+
+\begin{enumerate}[label=\alph*.]
+
+    \item In the E-step of the GMM, we subtract the row maximum from the unnormalized model outputs before computing the responsibilities. Explain how numerical overflow or underflow could occur if this stabilization step were not performed, how subtracting the row maximum helps prevent these issues, and how numerical instability could affect the EM algorithm's convergence.
+ \emph{Justify your answer (numerically, or brief explanation)}. [2pts]
+
+    \item In the implementation instructions for \textsf{logsumexp}, you are told to subtract the row maximums, calculate \textsf{logsumexp}, then add them back. \emph{Prove} (algebraically) how this process will return a correct result. More formally, let $l$ be a row of $D$ logits:
+    $$l = \{l_1, l_2, \cdots, l_D\}$$
+    Let $s^*$ be the result of logsumexp applied directly to $l$:
+    $$s^* = \log \left( \sum_{i=1}^D \exp(l_i) \right)$$
+    Let $s'$ be the result of logsumexp with our technique, subtracting the max before, adding the max after.
+    $$s' = \log \left( \sum_{i=1}^D \exp\left(l_i - \max_{j\in[1,D]}[l_j]\right) \right) + \max_{j\in[1,D]}[l_j]$$
+    You need to show that $s'=s^*$. [4pts]
+\end{enumerate}
+\newpage

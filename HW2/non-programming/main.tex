@@ -1,0 +1,95 @@
+% Document Setup
+\documentclass{article}
+\usepackage[english]{babel}
+\usepackage[letterpaper,top=1.5cm,bottom=1.5cm,left=1.5cm,right=1.5cm,marginparwidth=1cm]{geometry}
+\title{CS4641/CS7641 Homework 2 — Non-Programming}
+\author{Dr. Mahdi Roozbahani\hspace{2cm}Dr. Nimisha Roy\hspace{2cm}Dr. Rodrigo Borela Valente}
+\date{Deadline: October 23rd, 11:59 pm ET}
+\setlength\parindent{0pt}
+% end Document Setup
+
+
+
+% Common Packages
+% """ These are a few packages that may be generally useful (and those used in the typesetting of the questions).
+% """ If you find them cumbersome/conflicting with your preferred tools, you may remove them, but this may damage the rendering of some questions, and you are responsible for ensuring you don't misread a question due to a rendering failure. Remember that you don't need to do your work in this document, this is merely a starting point we provide.
+\usepackage{amsmath, amssymb, marvosym, bbold, bm, mathtools, xfrac} % math symbols
+\usepackage{array, multirow} % tables and matrices
+\usepackage{enumitem} % dynamic enumeration
+\usepackage{graphicx, float} % useful image inclusion
+\usepackage{ulem} % underlining
+\usepackage{tikz} % great for custom in-line figures, graphs, etc.
+\usepackage{xparse} % used for our custom linking
+
+% This is what we use to generate content boxes, you're welcome to use it in your solutions.
+\usepackage[most]{tcolorbox}
+\newtcolorbox{solutionbox}[1][]{
+    enhanced, enhanced jigsaw, breakable, colback=gray!10, colframe=gray!40, coltitle=black, arc=4pt, boxrule=0.5pt, boxsep=4pt, left=8pt, right=8pt, top=12pt, bottom=10pt, fonttitle=\bfseries, title=Solution, attach boxed title to top left={yshift=-2mm, xshift=3mm}, boxed title style={colback=gray!40, colframe=gray!60, sharp corners}, #1
+} % To make one of these boxes, just do \begin{solutionbox} or \begin{solutionbox}[optional argument override]
+\newtcolorbox{hintbox}[1][]{
+    enhanced, enhanced jigsaw, breakable, colback=blue!10, colframe=blue!40, coltitle=black, arc=4pt, boxrule=0.5pt, boxsep=4pt, left=8pt, right=8pt, top=12pt, bottom=10pt, fonttitle=\bfseries, title=Hint, attach boxed title to top left={yshift=-2mm, xshift=3mm}, boxed title style={colback=blue!30, colframe=blue!50, sharp corners}, #1
+} % We use these to supply hints.
+\newtcolorbox{warningbox}[1][]{ 
+    enhanced, enhanced jigsaw, breakable, colback=red!10, colframe=red!40, coltitle=black, arc=4pt, boxrule=0.5pt, boxsep=4pt, left=8pt, right=8pt, top=12pt, bottom=10pt, fonttitle=\bfseries, title=Warning, attach boxed title to top left={yshift=-2mm, xshift=3mm}, boxed title style={colback=red!30, colframe=red!50, sharp corners}, #1
+} % We use these to note grading directives.
+\allowdisplaybreaks
+
+% This is what we use to generate nice-looking links and hypertext references.
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, filecolor=magenta, urlcolor=cyan, pdftitle={Sharelatex Example}, pdfpagemode=FullScreen}
+\definecolor{TODO}{RGB}{180,0,0}
+\definecolor{done}{RGB}{0,0,238}
+\NewDocumentCommand{\link}{v m}{\href{#1}{\textcolor{done}{\uline{#2}}}}
+\NewDocumentCommand{\reviewlink}{v m}{\href{#1}{\textcolor{TODO}{\uline{#2}}}}
+% To make one of these links, just do \link{myUrl.com}{displayed text}
+% end Common Packages
+
+
+
+% Custom Commands
+\newcommand{\prob}{\mathbb{P}}
+\DeclareMathOperator{\tr}{tr}
+% end Custom Commands
+
+
+
+% Your Packages
+% """ You can use any package you'd like to format your solutions!
+% """ We don't mind what your LaTeX looks like, only that it's readable in its final render.
+%\usepackage{whateveryouwant}
+% end Your Packages
+
+
+
+% Rendering
+% """ The physical rendering of the document begins here!
+% """ To add rendered content, you may write anywhere below \begin{document}.
+% """ You may also add content in the provided files that are included with \input below.
+% """ You're also welcome to add your own solution files. Any way you want to render your solution is permissible, so long as it adheres to the guidelines in the instructions.
+\begin{document}
+
+\maketitle
+\input{text/warnings.tex}
+\textbf{Collaborators:} \textit{Please include whiteboard-level collaborators here, if any.}
+\newpage
+
+\input{text/instructions.tex}
+\newpage
+
+\input{text/points.tex}
+\newpage
+
+\input{questions/Q1.tex}
+
+\input{questions/Q2.tex}
+
+\input{questions/Q3.tex}
+
+\input{questions/Q4.tex}
+
+\input{questions/Q5.tex}
+
+\input{questions/Q6.tex}
+
+\input{questions/appendices.tex}
+\end{document}

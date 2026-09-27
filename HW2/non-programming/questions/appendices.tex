@@ -1,0 +1,56 @@
+\newpage
+\section*{Appendix}
+The appendix will include any information that is extraneous to the questions asked, but still informative. This content is not necessary for the homework, only if you're curious about further math.
+\subsection*{Justification for the ELBO}
+
+In the implementation of GMM, we maximize a tight lower bound, so-called, Evidence Lower BOund (ELBO). This is because the traditional MLE approach isn't very approachable—maybe numerically, but not analytically.
+\begin{align*}
+    \mathcal{L}(\theta; d) &= \prod_{n=1}^N p(d^{\{n\}} \mid\theta) \\
+    &= \prod_{n=1}^N \sum_{k=1}^K p(d^{\{n\}},z_k\mid\theta) \\
+    \ell(\theta; d) &= \ln\left[ \prod_{n=1}^N \sum_{k=1}^K p(d^{\{n\}},z_k\mid\theta) \right] \\
+    &= \sum_{n=1}^N \ln\left[ \sum_{k=1}^K p(d^{\{n\}},z_k\mid\theta) \right]
+\end{align*}
+
+Log of a sum won't give a clean gradient to zero out, but Jensen's might help us commute the sum through the log. That probability can be expanded (since $d^{\{n\}}$ and $z_k$ are conditionally independent), but even if we got something more Jensen's like, the weights would still be conditioned on $\theta$. We can't use variable weights, even if they are guaranteed to sum to one, they need to be constants for Jensen's ($\theta$ is a variable of the function). We can introduce a term dependent on the current parameters $\theta_{\text{curr}}$ (that sums to 1 over $K$), and maybe make some guarantees about the update range of the parameters.
+\begin{align*}
+    \ell(\theta; d) &= \sum_n^N\ln\left[\sum_k^K \left(\frac{p(z_k\mid d^{\{n\}},\theta_{curr})}{p(z_k\mid d^{\{n\}},\theta_{curr})}\right) \cdot p(d^{\{n\}},z_k\mid\theta)\right] \\
+    &= \sum_n^N\ln\left(\sum_k^K p(z_k\mid d^{\{n\}},\theta_{curr})\cdot\frac{p(d^{\{n\}},z_k\mid\theta)}{p(z_k\mid d^{\{n\}},\theta_{curr})}\right) \\
+    &\text{via total probability, }\textstyle\sum_k^K p(z_k\mid \cdots)=1 \\
+    &\text{via second derivative test, ln is concave} \\
+    &\text{thus, }\ln(\mathbb{E}[x])\geq \mathbb{E}[\ln(x)] \\
+    \therefore \ell(\theta; d) &\geq \sum_n^N\sum_k^K p(z_k\mid d^{\{n\}},\theta_{curr})\cdot\ln\left(\frac{p(d^{\{n\}},z_k\mid\theta)}{p(z_k\mid d^{\{n\}},\theta_{curr})}\right) \\
+    &= \sum_n^N\sum_k^K p(z_k\mid d^{\{n\}},\theta_{curr})\cdot\Bigg(\ln p(d^{\{n\}},z_k\mid\theta) - \ln p(z_k\mid d^{\{n\}},\theta_{curr}) \Bigg)
+\end{align*}
+
+We can further relax this lower bound by simply dropping the second log term. Since $p(z_k|...)$ is a probability and we've already implicitly assumed that it's never 0 or 1 in our E-step, which would mean that one of the components is useless (which is not possible for a Gaussian anyways), then we know $p(z_k\mid d^{\{n\}}, \theta_{curr}) \in(0,1)$. Thus, $\ln\;p(z_k\mid d^{\{n\}}, \theta_{curr}) \leq 0$. Since this term is always negative, and it's currently being subtracted, dropping this term would strictly decrease the value, which is just a loosening of the lower bound.
+\begin{align*}
+    \ell(\theta; d) &\geq \sum_n^N\sum_k^K p(z_k\mid d^{\{n\}},\theta_{curr})\cdot\ln\left( p(d^{\{n\}},z_k\mid\theta) \right) \\
+    &\text{definition of E-step's tau, verbatim} \\
+    \ell(\theta; d) &\geq \sum_n^N\sum_k^K \tau_{nk}\cdot\ln\left( p(d^{\{n\}},z_k\mid\theta)  \right)\\
+    &\text{for notation's sake, call it} \\
+    \ell(\theta; d) &\geq Q(\theta,\theta_{\text{curr}})
+\end{align*}
+
+And so, we get this function, $Q$, which is a valid lower bound on the log-likelihood ($\ell(\theta; d) \geq Q(\theta,\theta_{\text{curr}})$), it's evidenced by the E-step's estimate, and also, it should be tight if you don't go anywhere ($\ell(\theta_{\text{curr}}; d) = Q(\theta_{\text{curr}},\theta_{\text{curr}})$).
+
+\smallskip This is all well and good, but how can we be sure this iterative process will actually work? Honestly the math is above my head quite a bit, but I was able to prove that the optimal value for $\theta$ is shared, so if the current parameters constitute a locally maximum likelihood for the GMM, the EM process will stay stationary.
+
+\bigskip We can prove that with contradiction. To begin, assume the opposite of the implication ($p\land\lnot q$):\begin{itemize}
+    \item ``the current parameters constitute a locally maximum likelihood for the GMM'' means that $\theta_{\text{curr}}$ is a local maximum for $\ell(\theta; d)$
+    \item ``the EM process will \textbf{NOT} stay stationary'' means that $\theta_{\text{curr}}$ is not the global maximum for $Q(\theta,\theta_{\text{curr}})$ and the impending M-step would update $\theta=\arg_\theta\max Q(\theta,\theta_{\text{curr}})$. This implies that there exists some point $\theta'$ in an arbitrarily small $\epsilon$-neighborhood around $\theta_{\text{curr}}$ which satisfies $\mathcal{Q}(\theta', \theta_{\text{curr}})\geq\mathcal{Q}(\theta_{\text{curr}}, \theta_{\text{curr}})$.
+\end{itemize}
+The existence of $\theta'$ is not general, but we can choose it to be arbitrarily close to $\theta_{\text{curr}}$. Since $\theta_{\text{curr}}$ is a local maximum for $\ell(\theta; d)$ and we can get arbitrarily close, we can presume $\ell(\theta_{\text{curr}}; d)> \ell(\theta'; d)$.
+
+\smallskip Next, recall that the ELBO is tight at the current parameters, so $\ell(\theta_{\text{curr}}; d) = Q(\theta_{\text{curr}},\theta_{\text{curr}})$.
+
+\smallskip Finally, all of these observations link into a syllogism:
+\begin{align*}
+    \mathcal{Q}(\theta', \theta_{\text{curr}}) &\geq \mathcal{Q}(\theta_{\text{curr}}, \theta_{\text{curr}})=\ell(\theta_{\text{curr}}; d)> l(\theta'; d) \\
+    \mathcal{Q}(\theta', \theta_{\text{curr}}) &> \ell(\theta'; d) \\
+    &\text{however, we know }Q\text{ to be an ELBO for any input } \\
+    \mathcal{Q}(\theta', \theta_{\text{curr}}) &\overset{!}{\leq} \ell(\theta'; d)
+\end{align*}
+
+Thus, a contraction is shown, so the assumption was false, and the implication ``if the current parameters constitute a locally maximum likelihood for the GMM, the EM process will stay stationary'' is proven true. $\square$
+
+\bigskip If the EM algorithm ascends to a local max with the surrogate bound, it will stay there, but we haven't covered the if. Convergence is guaranteed, since likelihood is \link{https://en.wikipedia.org/wiki/Expectation%E2%80%93maximization_algorithm#Proof_of_correctness}{guaranteed to monotonically increase} at each iteration.

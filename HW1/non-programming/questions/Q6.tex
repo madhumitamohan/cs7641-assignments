@@ -1,0 +1,101 @@
+\section{Information Theory [35pts]}
+
+\subsection{Entropy Proofs [20pts]}
+Here, we'll prove some fundamental ideas in information theory regarding entropy. While you're encouraged to review the slides (we may even spoil some proofs), you should refrain from using any identities you find that involve information theory. In this question, you are expected to derive proofs using only standard rules of probability (and algebra of course), so as to avoid a circular argument, where the identity you apply is simply a corollary of the thing you're trying to prove. 
+
+\smallskip To be safe, stick to the following tools:
+\begin{itemize}
+    \itemsep0em
+    \item \textbf{Probability Axioms:} $0\leq P(X=x) \leq 1$, $\sum_x P(X=x) = 1$
+    \item \textbf{Definition of Conditional Probability:} $P(X=x | Y=y)\cdot P(Y=y) = P(X=x, Y=y)$
+    \item \textbf{Law of Total Probability:} $P(X=x) = \sum_y P(X=x, Y=y) = \sum_y P(X=x | Y=y)\cdot P(Y=y)$
+    \item \textbf{continuity extension of $x\log x$:} $0 \cdot \log_2 (0) = 0$
+    \item Any log properties.
+    \item The definitions given below.
+\end{itemize}
+
+
+Let $X$ be a discrete random variable with probability mass function $P(X=x)$ for $x \in \mathcal{X}$. Recall that \textit{entropy} is defined as:
+$$H(X) = -\sum_{x \in \mathcal{X}} P(X=x) \log_2 P(X=x)$$
+For two discrete random variables $X$ and $Y$, recall that \textit{conditional entropy} is defined as:
+$$H(X|Y) = \sum_{y \in \mathcal{Y}} P(Y=y) \left[ -\sum_{x \in \mathcal{X}} P(X=x | Y=y) \log_2 P(X=x | Y=y) \right]$$
+Using these definitions,
+
+
+\begin{enumerate}[label=\alph*.]
+    \item \emph{Prove} that $H(X) \geq 0$. [5pts]
+
+    \item Using that result, \emph{prove} that if $H(X) = 0$, then that random variable $X$ must be \textit{deterministic}\footnote{A random variable $X$ is ``deterministic'' if and only if there exists some $x_0$ in its support such that $P(X = x_0) = 1$.}. [5pts]
+
+    \item \emph{Prove} that $H(X) - H(X|Y) = \sum_{x,y} P(X=x, Y=y) \cdot \left(-\log_2\left(\frac{P(X=x)\cdot P(Y=y)}{P(X=x, Y=y)}\right)\right)$. Start from the given definitions and work algebraically to the result. [5pts]
+
+    \item Using that result, \emph{prove} that $H(X|Y) \leq H(X)$. [5pts]
+    \begin{hintbox}
+        Jensen's inequality may be useful for (d). Refer to the previous section for clarity on Jensen's.
+    \end{hintbox}
+\end{enumerate}
+
+
+
+\newpage
+\subsection{KL Divergence [5pts]}
+Recall the KL divergence formula:
+$$D_{\text{KL}}(P \| Q) = \sum_{x \in \mathcal{X}} P(x) \log_2 \frac{P(x)}{Q(x)}$$
+This measure is useful in ML because it almost acts as a distance measure between 2 probability distributions over $\mathcal{X}$, here $P$ and $Q$. We often want to compare a proposal distribution to a ground-truth distribution (e.g., GANs, classification), and this is a potentially useful tool.
+
+\smallskip Suppose we have a very fuzzy multi-class classification problem where not even human labelling is 100\% conclusive, and we actually want our models to model that uncertainty. We have a sample image and polling from a group of human labellers has given us the following distribution over the set of 4 possible labels:
+\begin{itemize}
+    \item True distribution: $P = [0.1, 0.25, 0.15, 0.50]$
+\end{itemize}
+
+3 different models have attempted to predict the consensus with the following outputs:
+\begin{itemize}
+    \itemsep0em
+    \item Model A predictions: $Q_A = [0.1, 0.15, 0.1, 0.65]$
+    \item Model B predictions: $Q_B = [0.2, 0.3, 0.05, 0.45]$
+    \item Model C predictions: $Q_C = [0.03, 0.24, 0.13, 0.6]$
+\end{itemize}
+
+\begin{enumerate}[label=\alph*.]
+    \item Calculate $D_{KL}(P \| Q_A)$, $D_{KL}(P \| Q_B)$, and $D_{\text{KL}}(P \| Q_C)$. \emph{Show your work. Round your final result to 3 decimal places.} [3pts]
+    \item Which model's predictions are ``closest'' to the true distribution? [2pts] % no work required
+\end{enumerate}
+
+
+
+\newpage
+\subsection{Entropy and Informativity [10pts]}
+
+A streaming service wants to understand user engagement patterns, so they collect data on user subscription tiers and viewing behavior. Consider the following subset.
+
+\begin{table}[H] % H arg forces the table to be placed exactly here regardless of badness.
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{User ID} & \textbf{Subscription Tier ($X$)} & \textbf{Binge Watched? ($Y$)} & \textbf{Device Type ($Z$)} \\
+        \hline
+        1 & Premium  & Yes & Mobile \\ \hline
+        2 & Basic    & No  & TV     \\ \hline
+        3 & Premium  & No  & Mobile \\ \hline
+        4 & Standard & No  & TV     \\ \hline
+        5 & Basic    & Yes & TV     \\ \hline
+        6 & Premium  & Yes & TV     \\ \hline
+        7 & Standard & No  & Mobile \\ \hline
+        8 & Basic    & No  & Mobile \\ \hline
+        9 & Premium  & Yes & TV     \\ \hline
+        10 & Standard & Yes & Mobile \\ \hline
+        11 & Standard & Yes & TV   \\ \hline
+        12 & Premium & Yes & TV    \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{enumerate}[label=\alph*.]
+    \item Calculate $H(Y)$, the entropy of binge watching behavior. \emph{Show your work. Round your final result to 3 decimal places.} [3pts]
+
+    \item Compute $H(Y|X)$, the conditional entropy of binge watching given subscription tier. \emph{Show your work. Round your final result to 3 decimal places.} [3pts]
+
+    \item Find $I(X;Y)$, the mutual information between subscription tier and binge watching. \emph{Show your work. Round your final result to 3 decimal places.} [2pts]
+
+    \item Suppose we want to make a crude demo model using just one accessible feature to predict binge watching behavior. If we're constrained to use only one feature, subscription tier or device type, which would be more informative and why? [2pts]
+\end{enumerate}
+

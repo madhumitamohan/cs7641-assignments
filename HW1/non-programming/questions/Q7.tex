@@ -1,0 +1,11 @@
+\section{Entropy Bound [4\% Bonus for All]}
+
+Earlier, we explored the lower bound on entropy. Now, we'll discuss the upper bound.
+
+\bigskip Let $X$ be a random variable whose support is the set $\{x_1, x_2, \dots, x_K\}$. The random variable $X$ will take value $x_i$ with probability $p_i$, i.e., $P(X = x_i) = p_i$ for $1\leq i\leq K$. Thus, there exists a set of possible probability distributions for $X$,
+$$\mathcal{P}=\left\{(p_1, p_2,\cdots, p_K)\in \mathbb{R}^K \;\Bigg\vert\; \forall i [p_i\geq 0], \text{ and }\sum_{i=1}^K p_i=1\right\}$$
+This is a set of vectors in $\mathbb{R}^K$ that are constrained by a geometric surface (here, a plane). We call such a set of vectors a \textit{simplex}.
+
+\smallskip Recall that Shannon entropy, $H$, is defined on probability distributions where, if $X$ takes a probability distribution $q=(q_1, q_2, \cdots, q_K)$ from the simplex $\mathcal{P}$, then the Shannon entropy of $X$ under $q$ is defined as:
+$$H(X_q)=\sum_{i=1}^K -q_i\cdot\log_2(q_i)$$
+The uniform distribution $u=(u_1, u_2, \cdots, u_K)$ is an element of the simplex $\mathcal{P}$ where $u_i=\frac{1}{K}$ for all $1\leq i\leq K$ (all values have the same probability). \emph{Prove} that the uniform distribution is an element of this simplex that, when used as a probability distribution for $X$, maximizes $H(X)$. [4\% EC]

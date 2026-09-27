@@ -1,0 +1,19 @@
+\section{K-Selection Problem [3\% Bonus For All]}
+In the Programming assignment (section 1.1-1.3), you should have implemented the backbone of k-Means. The notebook contains some information which may be useful in answering this question.
+
+\bigskip In practice, the hardest part about using k-Means is picking an optimal value for k. Your assignment includes a data file ``clusterable.csv'', on which you'll attempt to do k-Means clustering. Read through the section informing you about how to evaluate clustering metrics in the notebook (section 1.4).
+
+\bigskip Your task is to estimate the optimal value of k for ``clusterable.csv''. To do this, you should pick any clustering metric, apply that clustering metric across a range of possible values for k, plot those results in a line plot (metric vs. k-value), embed the line plot into this document, and then provide an analysis of the graph and what k-value it suggests. Note that using only one metric may not be sufficient to support your answer. If you do this for real data in the real world, you'll want to use every tool available to you, and the tools will often disagree.
+
+\bigskip To receive credit, you should:\begin{itemize}
+    \item For each metric:\begin{itemize}
+        \item Name the metric, briefly explain the metric, and mention what values would suggest a good k on that metric.
+        \item Embed a plot of the metric's performance vs. proposed k-values.
+        \item Analyze the plot. Make a guess for k based on the plot and briefly explain how confident this guess is.
+        \item Remember, negative results are good too! Even if your plot tells you nothing, it's still useful to a reader to see what you tried. You can simply ignore a useless result, but you should still include it.
+    \end{itemize}
+    \item If you find your first metric to not be so convincing, you should repeat those steps for new metrics. Once you're satisfied with your answer, analyze all of the individual results and make a final recommendation based on some combination of the results.
+    \item With your chosen value of k, cluster the data with that k-value one more time, make a scatter-plot with each cluster colored differently and embed that here. [3\% Bonus For All]
+\end{itemize}
+
+\newpage

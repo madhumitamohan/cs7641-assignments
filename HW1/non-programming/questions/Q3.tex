@@ -1,0 +1,90 @@
+\section{Probability and Statistics [30pts]}
+
+
+
+\subsection{Joint Distributions and Independence [6pts]}
+The following table summarizes data collected from 10 students. Let $X$ be a random variable that is $1$ if the student studied for an exam and $0$ otherwise. Let $Y$ be a random variable that is $1$ if the student passed the exam and $0$ otherwise.
+
+\begin{center}
+\begin{tabular}{l|cc|r}
+\hline\hline
+ & $Y=1$ (Passed) & $Y=0$ (Failed) & Total \\
+\hline
+$X=1$ (Studied) & 4 & 2 & 6 \\
+$X=0$ (Didn't Study) & 1 & 3 & 4 \\
+\hline
+Total & 5 & 5 & 10 \\
+\hline\hline
+\end{tabular}
+\end{center}
+
+Answer the following questions using the empirical data about $X$ and $Y$ in the table above.
+
+\begin{enumerate}[label=\alph*.]
+    \item Compute $P(X=1, Y=1)$. \emph{Round your final result to 3 decimal places.} [1pts] % no work required to be shown
+
+    \item Compute the marginal probabilities $P(X=1)$ and $P(Y=1)$. \emph{Round your final result to 3 decimal places.} [1.5pts] % no work required to be shown
+
+    \item Compute the conditional probability $P(Y=1 \mid X=1)$. \emph{Round your final result to 3 decimal places.} [1.5pts] % no work required to be shown
+
+    \item Are $X$ and $Y$ statistically independent? \emph{Justify your answer} using your previous calculations. [2pts]
+\end{enumerate}
+\newpage
+
+
+
+\subsection{Covariance and Correlation [8pts]}
+\begin{enumerate}[label=\alph*.]
+    \item Suppose $X$ and $Y$ are two random variables. $X$ has the pmf:
+    $$
+    p(x) = \begin{cases} 0.3 & x = c \\ 0.7 & x = -c \end{cases}
+    $$
+    where $c$ is a nonzero constant. Let $Y$ obey the Standard Normal distribution, $Y \sim \mathcal{N}(0, 1)$.
+    
+    $X$ and $Y$ are statistically independent. Define a new random variable $Z = X - Y$. Calculate the covariance of $Y$ and $Z$, i.e., $\mathsf{Cov}(Y, Z)$. \emph{Show your work. Round your final result to 3 decimal places.} [5pts]
+
+    \item Let $A$ and $B$ be statistically independent random variables with $\mathsf{Var}(A) = 2$ and $\mathsf{Var}(B) = 15$. Define a new random variable $C = 4A + 2B$. The correlation coefficient, $\rho(A, C)$, is defined as:
+    $$
+    \rho(A, C) = \frac{\mathsf{Cov}(A, C)}{\sqrt{\mathsf{Var}(A)\,\mathsf{Var}(C)}}
+    $$
+    Calculate $\rho(A, C)$, the correlation coefficient between $A$ and $C$. \emph{Show your work. Round your final result to 3 decimal places.} [3pts]
+\end{enumerate}
+\newpage
+
+
+
+\subsection{Gaussian Distributions vs. Gaussian-Distributed Random Variables [6pts]}
+You are given two \textbf{independent} random variables, $X_1 \sim \mathcal{N}(\mu_1, \sigma_1^2)$ and $X_2 \sim \mathcal{N}(\mu_2, \sigma_2^2)$.
+These are ``\textit{Gaussian-distributed random variables},'' that is, their probability density functions are described by the Gaussian function:
+$$\mathcal{N}(\mu, \sigma^2)=\frac{1}{\sqrt{2\pi\sigma^2}}\cdot \exp\left( -\frac{(x-\mu)^2}{2\sigma^2} \right)$$
+
+\begin{enumerate}[label=\alph*.]
+    \item Let $Y = X_1 + X_2$. One way to conceptualize sampling a value for $Y$ is to imagine sampling a value for both $X_1$ and $X_2$, then adding the results of those trials. Curiously, the probability density function of $Y$ is also a Gaussian. The standard result for $Y = X_1 + X_2$ would be $Y \sim \mathcal{N}(\mu_1 + \mu_2, \sigma_1^2 + \sigma_2^2)$. Proving that $Y$ is actually Gaussian-distributed requires some tools we haven't taught, but a much easier result is to confirm the mean and variance.
+
+    Show that $\mathbb{E}[Y]=\mu_1 + \mu_2$ and $\mathsf{Var}(Y)=\sigma_1^2 + \sigma_2^2$. \emph{Show your work.} [3pts]
+
+    \item Now consider a new random variable $Z$, defined as:
+    $$Z = \begin{cases}
+        X_1 & \text{with probability } 0.5 \\
+        X_2 & \text{with probability } 0.5
+    \end{cases}$$
+    Can $Z$ be described as a Gaussian random variable? \emph{Briefly (1-2 sentences or quick math) justify} your choice. [3pts]
+
+\end{enumerate}
+\newpage
+
+
+
+\subsection{Conceptual Questions and Proofs [10pts]}
+\begin{enumerate}[label=\alph*.]
+    \item Variance is defined as the expected amount by which data varies from the mean.
+    $$\mathsf{Var}(X) = \mathbb{E}[(X-\mathbb{E}[X])^2]$$
+    You can also formulate variance using only the first- and second-order moments of the random variable.
+    $$\mathsf{Var}(X) = \mathbb{E}[X^2] - (\mathbb{E}[X])^2$$
+
+    Using algebra and expectation identities, \emph{prove} that these two formulations are equivalent. [5pts]
+
+    \item \emph{Explain} in your own words why two random variables can be uncorrelated (i.e., $\mathsf{Cov}(A, B)=0$) but also not statistically independent (i.e., $P(A,B)\neq P(A)\cdot P(B)$).
+    Also, \emph{provide one simple example} of two random variables that demonstrate this property. [5pts]
+\end{enumerate}
+\newpage

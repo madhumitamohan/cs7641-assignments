@@ -1,0 +1,48 @@
+\section{EM Algorithm [15pts + 1\% Bonus For All]}
+\subsection{Performing an EM Update [15pts]}
+Consider a univariate Gaussian Mixture Model (GMM) with two components. We'll add a slight variation: each component's mean and variation is parametrized together. In a normal GMM these are optimized separately, but this will save you some algebraic trouble. Our model is defined by the following parameter set $\theta=\{\alpha, \nu, \omega\}$, with:
+$$\boldsymbol{z} = \begin{cases}
+    0 &\text{with }p=\alpha \\
+    1 &\text{with }p=1-\alpha \\
+\end{cases}$$
+$$p(x \mid \boldsymbol{z}=0, \theta) = \mathcal{N}(x; \mu=4\nu, \sigma^2=7\omega) = \frac{\exp\left(-\frac{(x-4\nu)^2}{14\omega}\right)}{\sqrt{14\pi\omega}}$$
+$$p(x \mid \boldsymbol{z}=1, \theta) = \mathcal{N}(x; \mu=5\nu, \sigma^2=8\omega) = \frac{\exp\left(-\frac{(x-5\nu)^2}{16\omega}\right)}{\sqrt{16\pi\omega}}$$
+Let's use this GMM to model the underlying distribution of a dataset $d=\{ d^{\{1\}}, d^{\{2\}}, \cdots, d^{\{N\}} \}$. We aren't sure that it's a good fit yet, so we'll do an EM step to refine the parameters' ($\alpha, \nu, \omega$) values.
+
+\begin{enumerate}[label=\alph*.]
+    \item Express the marginal probability density of the model $p(x\mid\theta)$ for an arbitrary value $x$. You may leave your answer in terms of $\mathcal{N}(x; \dots)$, no need to expand out Gaussians yet. \emph{Show your work.} [2pts]
+    \begin{hintbox}
+        The rule of total probability may help. % TODO: Is this hint necessary?
+    \end{hintbox}
+
+    \item \textbf{E-Step:} Compute the posterior probability that a given arbitrary value $x$ belongs to either component, the responsibilities of that value, $p(z=0\mid x,\theta)$ and $p(z=1\mid x,\theta)$. You may leave your answer in terms of $\mathcal{N}(x; \dots)$, no need to expand out Gaussians yet. \emph{Show your work.} [4pts]
+    \begin{hintbox}
+        Bayes's rule may help. % TODO: Is this hint necessary?
+    \end{hintbox}
+
+    \item \textbf{M-Step:} To make an estimate on our parameters, we can use the maximum likelihood estimator. Making the standard assumption that data are i.i.d., likelihood can be expressed as:
+    $$\mathcal{L}(\theta; d) = p(d\mid \theta) = \prod_{n=1}^N p(d^{\{n\}} \mid\theta)$$
+    Unfortunately, this won't lend itself easily to optimization. Instead we'll maximize an evidence lower bound (ELBO) of the log-likelihood that is tight around the current values of the parameter set\footnote{A derivation of this ELBO can be found in the appendices of this document.}.
+    $$\ell(\theta; d) \geq \sum_{n=1}^N \sum_k^{\{0,1\}} \left[ p(z=k\mid d^{\{n\}}, \theta_{\text{curr}})\cdot \ln\left(p(d^{\{n\}}, z=k \mid \theta)\right) \right]$$
+    \begin{hintbox}
+        $\theta_{\text{curr}}$, here, refers to the values of $\theta$ in the current iterative step. You may recognize the term $p(z=k\mid d^{\{n\}}, \theta_{\text{curr}})$ from lecture as responsibility—the probability that a point belongs in a particular cluster. This is what you computed in the E-Step, just applied to our dataset. Notationally, we can let $\tau_{nk} = p(z=k\mid d^{\{n\}}, \theta_{\text{curr}})$. For this step, all $\tau_{nk}$ are constants, whose derivative with respect to anything is 0.
+    \end{hintbox}
+
+    From this expression, use the derivative to find the value of $\omega$ that maximizes the ELBO. Simplify your result as much as possible, and leave your answer in terms of $\tau$, $d$, $\upsilon$, and $N$. \emph{Show your work.} [9pts]
+\end{enumerate}
+\newpage
+
+
+
+
+\subsection{Gradient Ascent Comparison [1\% Bonus For All]}
+
+EM cannot be applied to every problem, in that it only applies to a specific problem structure: one with latent variables. In the GMM problem, the hidden variable is the responsibilities. If we knew the ground truth responsibilities, we could simply use MLE to find the optimal model instantly. EM leverages this structure to get an efficient solution. However, there are other tools we could have used.
+
+\smallskip Gradient ascent/descent is a far more general optimization technique, in that it can work on any problem where you have a differentiable objective function (which is most problems in ML). To apply it to this problem, we could analytically compute the gradient of the log-likelihood with respect to the parameters, then take a small step in the parameter space in a direction that would increase the log-likelihood. Eventually, this process will find a maximum.
+
+\smallskip GA might be favorable here, not to mention that there's a veritable ocean of literature on improving gradient ascent/descent. It's not really leveraging specifics of the problem, but it's a prolific algorithm. We could just as easily solve this problem with gradient ascent, and maybe it would do it better.
+$$\theta = \theta_{\text{curr}} + \eta\nabla \mathcal{L}(\theta_{\text{curr}})$$
+
+\bigskip What is one specific advantage that EM might have over gradient ascent for the problem explored in the previous section, that is to say, what is one reason you might choose EM over GA? \emph{Justify your answer with evidence. Either show your workings or cite from peer-reviewed literature.} [1\% Bonus For All]
+\newpage
