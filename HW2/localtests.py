@@ -858,3 +858,9 @@ class DBScanTests(unittest.TestCase):
             msg="You should've visited {0, 2, 5, 7, 8}, did you catch'em all?",
         )
         print_success_message()
+
+if __name__ == "__main__":
+    suite = unittest.TestLoader().loadTestsFromName(
+        "localtests.KMeansTests.test_init"
+    )
+    unittest.TextTestRunner(verbosity=2).run(suite)

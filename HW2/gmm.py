@@ -38,7 +38,10 @@ class GMM(object):
             while np.prod(logit, axis=1, keepdims=True).shape will result in (N,1)
             This will save you a line if you need to broadcast over the dimension you just collapsed.
         """
-        raise NotImplementedError
+
+        stable_values = logit - np.max(logit, axis=1, keepdims= True)
+        prob = np.divide(np.exp(stable_values), np.sum(np.exp(stable_values), axis = 1, keepdims=True))
+        return prob
 
     @staticmethod
     def logsumexp(logit):
@@ -52,7 +55,11 @@ class GMM(object):
         Hints:
             Refer to the hint for softmax.
         """
-        raise NotImplementedError
+        max_values =  np.max(logit, axis= 1, keepdims=True)
+        stable_values = logit - max_values
+        s_inter = np.log(np.sum(np.exp(stable_values), axis = 1, keepdims= True))
+        s = s_inter + max_values
+        return s.squeeze() #To convert dimension from N,1 to N,
 
     @staticmethod
     def multinormalPDF(points, mu, sigma):
@@ -74,7 +81,25 @@ class GMM(object):
             1. Use np.linalg.det() and np.linalg.inv(). Don't code your own linalg package.
             2. This is a static method; you should compute over the points given, not those in self.points.
         """
-        raise NotImplementedError
+        covariance = sigma
+        try:
+            inv = np.linalg.inv(covariance)
+        except LinAlgError:
+            covariance = sigma + SIGMA_CONST
+            inv = np.linalg.inv(covariance)
+
+        D = points.shape[1]
+        denom = np.sqrt(np.power(2 * np.pi, D) * np.linalg.det(covariance))
+        constant = 1/denom
+
+        x_minus_mu = points-mu
+        exp_part_1 = x_minus_mu @ inv
+
+        exp_part_2 = - (np.sum(exp_part_1 * x_minus_mu, axis = 1) /2)
+
+        pdf = constant * np.exp(exp_part_2)
+        return pdf
+
 
     def create_pi(self):
         """
@@ -85,7 +110,8 @@ class GMM(object):
         Return:
             pi: np.ndarray(K), the mixing coefficients
         """
-        raise NotImplementedError
+        pi = np.ones(self.K) / self.K
+        return pi
 
     def create_mu(self):
         """
@@ -96,7 +122,8 @@ class GMM(object):
         Return:
             mu: np.ndarray(K,D), the Gaussians's means
         """
-        raise NotImplementedError
+        indices = np.random.choice(self.N, self.K, replace=False)
+        return self.points[indices]
 
     def create_sigma(self):
         """
@@ -110,7 +137,8 @@ class GMM(object):
             np.eye() makes an identity matrix :)
             You'll need K of them though.
         """
-        raise NotImplementedError
+        sigma = np.tile(np.identity(self.D), (self.K, 1, 1))
+        return sigma
 
     def _init_components(self):
         """
@@ -142,7 +170,13 @@ class GMM(object):
             Pay careful attention to the usage of LOG_CONST.
             You should unconditionally include it, unlike SIGMA_CONST.
         """
-        raise NotImplementedError
+        log_likelihood = np.empty((self.N, self.K))
+        for k in range(self.K):
+
+            likelihood =  pi[k] * self.multinormalPDF(self.points, mu[k], sigma[k]) + LOG_CONST
+            log_likelihood[:, k] = np.log(likelihood)
+        
+        return log_likelihood
 
     def _E_step(self, pi, mu, sigma):
         """
@@ -159,7 +193,12 @@ class GMM(object):
             Re-read the background material for the formulation of responsibility.
             The E-Step can be done solely using two of the helper functions you've already made.
         """
-        raise NotImplementedError
+        # log_likelihood_values = self._ll_joint(pi, mu, sigma) #n*k size
+        # for k in range(self.K):
+        #     num = np.exp(log_likelihood_values[:, k])
+        #     denom = np.sum(log_likelihood_values, axis=1)
+        #     tau = num/denom
+        return self.softmax(self._ll_joint(pi,mu,sigma))
 
     def _M_step(self, tau):
         """
@@ -175,7 +214,17 @@ class GMM(object):
         Hint:
             There are formulas in the slides and in the Jupyter Notebook.
         """
-        raise NotImplementedError
+        N_k = np.sum(tau, axis= 0)
+        pi = (N_k / self.N)
+
+        mu = np.empty((self.K, self.D))
+        sigma = np.empty((self.K, self.D, self.D))
+        for k in range(self.K):
+            mu[k] = np.sum(tau[:, k, np.newaxis] * self.points, axis=0)/N_k[k]
+            centered = self.points - mu[k]
+            sigma[k] = ((tau[:, k, np.newaxis] * centered).T @ centered) /N_k[k]
+
+        return pi, mu, sigma
 
     def __call__(self, rel_tol=1e-10, disable_tqdm=False):
         """
