@@ -202,7 +202,8 @@ def pairwise_dist(x, y):
     distance_component_1 = np.sum(np.square(x), axis = 1, keepdims = True) 
     distance_component_2 = np.sum(np.square(y), axis = 1, keepdims = True).T 
     distance_component_3 = 2 * (x @ y.T)
-    return np.sqrt(distance_component_1 + distance_component_2 - distance_component_3)
+    distance_inter = distance_component_1 + distance_component_2 - distance_component_3
+    return np.sqrt(np.maximum(distance_inter,0))
 
 
 def adjusted_rand_statistic(xGroundTruth, xPredicted):

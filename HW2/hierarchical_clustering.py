@@ -24,7 +24,11 @@ class HierarchicalClustering(object):
             dist: N x M array, where dist[i, j] is the euclidean distance between
             x[i, :] and y[j, :]
         """
-        raise NotImplementedError
+        distance_component_1 = np.sum(np.square(x), axis = 1, keepdims = True) 
+        distance_component_2 = np.sum(np.square(y), axis = 1, keepdims = True).T 
+        distance_component_3 = 2 * (x @ y.T)
+        return np.sqrt(distance_component_1 + distance_component_2 - distance_component_3)
+
 
     def create_distances(self, points: np.ndarray):
         """
@@ -38,7 +42,12 @@ class HierarchicalClustering(object):
             cluster_ids: (N,) numpy array where index_array[i] gives the cluster id of the i-th column
                          and i-th row of distances. Initially, each point i is assigned cluster id i
         """
-        raise NotImplementedError
+        distances = self.pairwise_dist(points, points)
+        np.fill_diagonal(distances, np.inf)
+
+        cluster_ids = np.arange(points.shape[0])
+
+        return distances, cluster_ids
 
     def iterate(self):
         """
@@ -59,7 +68,33 @@ class HierarchicalClustering(object):
         While self.distances and self.cluster_ids only keeps information about the current clusters,
             self.cluster_sizes keep track of sizes for all clusters
         """
-        raise NotImplementedError
+        flat_idx = np.argmin(self.distances)
+        first_idx, second_idx = np.unravel_index(flat_idx, self.distances.shape)
+        dist_first_and_second = self.distances[first_idx, second_idx]
+
+        new_distances = np.minimum(self.distances[first_idx, :], self.distances[second_idx, :])
+
+        self.distances[first_idx, :] = new_distances
+        self.distances[:, first_idx] = new_distances
+        self.distances[first_idx, first_idx] = np.inf
+
+        
+        self.distances = np.delete(self.distances, second_idx, axis=1)
+        self.distances = np.delete(self.distances, second_idx, axis=0)
+
+        first_cluster_id = self.cluster_ids[first_idx]
+        second_cluster_id = self.cluster_ids[second_idx]
+
+        new_cluster_id = self.N + self.current_iteration        
+        self.cluster_ids[first_idx] = new_cluster_id
+        self.cluster_ids = np.delete(self.cluster_ids, second_idx)
+        
+        new_cluster_size = self.cluster_sizes[first_cluster_id] + self.cluster_sizes[second_cluster_id]
+        self.cluster_sizes[new_cluster_id] = new_cluster_size
+
+        self.clustering[self.current_iteration] = [first_cluster_id, second_cluster_id, dist_first_and_second, new_cluster_size]
+
+        self.current_iteration += 1
 
     def fit(self):
         """
@@ -69,4 +104,7 @@ class HierarchicalClustering(object):
         Return:
             self.clustering, where self.clustering[iteration_index] = [i, j, distance between i and j, size of new cluster]
         """
-        raise NotImplementedError
+        for _ in range(self.N - 1):
+            self.iterate()
+            
+        return self.clustering

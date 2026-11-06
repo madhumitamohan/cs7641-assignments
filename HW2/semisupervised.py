@@ -17,7 +17,9 @@ def complete_(data):
     Return:
         labeled_complete: np.ndarray(?,D+1), the rows of data that have all features and a label
     """
-    raise NotImplementedError
+    nan_mask = np.isnan(data) #N,D+1 array with true whenever nan is present
+    rows_with_nan = nan_mask.any(axis = 1) #For each row, if nan is present in any column, get the row
+    return data[~rows_with_nan]
 
 
 def incomplete_(data):
@@ -30,8 +32,11 @@ def incomplete_(data):
     Return:
         labeled_incomplete: np.ndarray(?,D+1), the rows of data that have a label but are missing at least 1 feature
     """
-    raise NotImplementedError
+    feature_nan_mask = np.isnan(data[:, :-1]) #N,D+1 array with true whenever nan is present
+    rows_with_nan_features = feature_nan_mask.any(axis = 1) #For each row, if nan is present in any column, get the row
 
+    rows_with_non_nan_labels = ~np.isnan(data[:, -1])
+    return data[rows_with_nan_features & rows_with_non_nan_labels]
 
 def unlabeled_(data):
     """
@@ -43,8 +48,12 @@ def unlabeled_(data):
     Return:
         unlabeled_complete: np.ndarray(?,D+1), the rows of data that have all features but are missing a label
     """
-    raise NotImplementedError
+    rows_with_nan_labels = np.isnan(data[:, -1]) 
 
+    feature_nan_mask = np.isnan(data[:, :-1]) 
+    rows_with_non_nan_features = ~feature_nan_mask.any(axis = 1) 
+
+    return data[rows_with_nan_labels & rows_with_non_nan_features]
 
 class CleanData:
     def __init__(self):
@@ -71,7 +80,17 @@ class CleanData:
             You may use the large intermediate technique where first you broadcast up to (N,M,D) then sum over D.
             Of course, you will need to take care of nans. np.isnan and np.where will be especially useful.
         """
-        raise NotImplementedError
+        D = np.shape(x)[1]
+        valid = (~np.isnan(x[:, None, :])) & (~np.isnan(y[None, :, :]))
+        diff = np.where(valid, x[:, None, :] - y[None, :, :], 0)
+
+        count = valid.sum(axis=2)
+        squared_sum = np.sum(diff ** 2, axis=2)
+
+        distances = np.sqrt(squared_sum * D / count)
+        distances[count == 0] = np.nan
+        return distances
+
 
     def __call__(self, incomplete_points, complete_points, K, **kwargs):
         """

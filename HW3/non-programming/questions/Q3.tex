@@ -1,0 +1,10 @@
+\section{Ridge Regression [8pts]}
+This question covers content from section 4.1-3 of the Programming assignment. While that section may be helpful, this question is standalone.
+
+\bigskip One weakness of linear regression is that it requires the pseudo-inverse of $X$, namely, $\theta=(X^\top X)^{-1}X^\top y$, which is problematic since highly correlated features may cause the inverse of $X^\top X$ to not exist or be numerically instable. Ridge regression avoids this by adding a regularization term to the solution: $\theta=(X^\top X+\lambda I)^{-1}X^\top y$, for some $\lambda>0$.
+
+\smallskip \emph{Prove that}, for any $X$, $X^\top X+\lambda I$ is invertible (with $\lambda>0$). [8pts]
+
+\begin{hintbox}
+    There are several ways to attack this proof. However, if you're unsure where to begin, we'll give a starting point. A useful thing to note is that every ``positive definite'' matrix is invertible, and it's much easier to prove that $X^\top X+\lambda I$ is ``positive definite.'' We say a matrix $A$ is positive definite if and only if $v^\top Av > 0$ for all vectors $v\neq \boldsymbol{0}$.
+\end{hintbox}

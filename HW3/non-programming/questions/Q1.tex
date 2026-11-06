@@ -1,0 +1,42 @@
+\section{Profile Screening Using Naive Bayes [7pts]}
+Naive Bayes Classifiers are discussed in section 5 of the Programming assignment, though to complete this section, you only need to know one formula. Based on some observed feature vector $x = [x_{1}, \ldots, x_{d}]$, Naive Bayes Classifiers choose a class, $y$, based on a simple argmax:
+$$
+\arg \max_y\;\; P({x_{1}} \mid y) \cdot \ldots \cdot P({x_{d}} \mid y) \cdot P(y)
+$$
+
+A tech company has devised an automated resume screening system (it's just Naive Bayes) for two distinct roles: Machine Learning Engineer and Product Manager. This system is designed to evaluate applicants based on five key binary attributes extracted from their resumes: \{coding proficiency (1 for high, 0 for low), data analysis skills (1 for strong, 0 for weak), leadership experience (1 for yes, 0 for no), product design experience (1 for yes, 0 for no), marketing skills (1 for strong, 0 for weak)\}.
+
+They have compiled a dataset of 15 anonymized resumes from their past hire cycles, and would like to filter resumes from a career fair directly to the appropriate hiring teams.
+
+\bigskip
+\begin{center}
+\begin{tabular}{| c | c | c | c | c | c |}
+    \hline
+    Role & Coding & Data Analysis & Leadership & Product Design & Marketing \\\hline\hline
+    Machine Learning Engineer & 1 & 1 & 0 & 0 & 1 \\\hline
+    Machine Learning Engineer & 1 & 1 & 0 & 0 & 0 \\\hline
+    Machine Learning Engineer & 1 & 0 & 1 & 0 & 0 \\\hline
+    Machine Learning Engineer & 1 & 1 & 0 & 0 & 0 \\\hline
+    Machine Learning Engineer & 0 & 1 & 0 & 0 & 0 \\\hline
+    Machine Learning Engineer & 0 & 1 & 0 & 1 & 0 \\\hline
+    Machine Learning Engineer & 0 & 0 & 0 & 0 & 0 \\\hline
+    Machine Learning Engineer & 0 & 0 & 1 & 0 & 0 \\\hline
+    Product Manager & 1 & 0 & 1 & 0 & 1 \\\hline
+    Product Manager & 0 & 1 & 0 & 1 & 1 \\\hline
+    Product Manager & 1 & 1 & 0 & 0 & 1 \\\hline
+    Product Manager & 1 & 1 & 1 & 1 & 1 \\\hline
+    Product Manager & 0 & 0 & 0 & 1 & 1 \\\hline
+    Product Manager & 0 & 0 & 1 & 0 & 1 \\\hline
+    Product Manager & 0 & 0 & 1 & 1 & 0 \\\hline
+\end{tabular}
+\end{center}
+\bigskip
+
+A new applicant's resume has been screened and binarized. They are proficient in coding and data analysis, they have no leadership nor product design experience, but they do have marketing skills. Using a Naive Bayes classifier, determine the most suitable job position for the new applicant. \emph{Show your work. Round the final probabilities to 6 decimal places.} [7pts]
+
+\begin{warningbox}
+    You must show show your intermediate values for the likelihoods, $P(x|y)$; the priors, $P(y)$; and the estimated logits, $\propto P(y|x)$; as queried from the given table. This is required work and will be graded, not just the final decision.
+
+    \bigskip
+    Also, don't divide your answer by the marginal, $P(x)$. Since this is not a function of the label, it will be the same for every label, thus this additional division is not necessary when using Naive Bayes classification and should be skipped. Doing so will result in a deduction during grading. You should use the formula presented.
+\end{warningbox}

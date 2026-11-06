@@ -1,0 +1,42 @@
+\section{Regression Under Noise [4.4\% Bonus For All]}
+
+Consider a linear model of the form:
+
+$$\hat{y}(\vec{x_i},\theta) = \theta_0 + \sum_{d=1}^D\theta_dx_{id}$$
+
+where $\vec{x_i} = (x_{i1}, \ldots, x_{iD}) \in \mathbb{R}^{D}$ and weights $\theta = \{\theta_0, \ldots, \theta_D\} \in \mathbb{R}^{D+1}$. Given the the D-dimensional input data set $X = \{ \vec{x_1}, \ldots, \vec{x_N}\}$ with corresponding target values $y = \{y_1, \ldots, y_N\}$, the sum-of-squares error function for the model is defined as:
+
+$$E_D(\theta) = \frac{1}{2}\sum_{n=1}^N\left[\hat{y}(\vec{x_n},\theta)-y_n\right]^2$$
+
+Now, suppose that Gaussian noise $\vec{\epsilon_n} \in \mathbb{R}^{D}$ is added independently to each of the input samples $\vec{x_n}$ to generate a new data set $X'= \{\vec{x_1}', \ldots, \vec{x_N}'\}=\{\vec{x_1}+\vec{\epsilon_1}, \ldots, \vec{x_N}+\vec{\epsilon_N}\}$. To be specific, $\vec{x_k}' = (x_{k1}+\epsilon_{k1}, \ldots, x_{kD}+\epsilon_{kD})$. We define the Gaussian noise to be zero mean (i.e., $E[\epsilon_{ij}]=0$), with variance $\sigma^2$ (i.e., $\mathsf{Var}(\epsilon_{ij})=\sigma^2$), and each individual noise term is independent and identically distributed (i.i.d.).
+
+
+\begin{enumerate}[label=\alph*.]
+    \item Show that $\hat{y}(\vec{x_n}',\theta) = \hat{y}(\vec{x_n}, \theta) + \sum^D_{d=1}\theta_d\epsilon_{nd}$. \emph{Show your work.} [1.0\% Bonus For All]
+
+    \item Denote the sum-of-squares error function of the noised data set $X'$ as $E_D(\theta)'$. Show that the expectation of $E_D(\theta)'$ is equivalent to the sum-of-squares error for noise-free input data, $E_D(\theta)$, with the addition of some term which resembles the $\ell_2$ norm of $\theta$, in which the bias parameter $\theta_0$ is omitted, that is, a "weight-decay regularizer." In other terms, you need to show that
+    $$\mathbb{E}[E_D(\theta)'] = E_D(\theta) + \text{Regularizer}$$
+    \emph{Show your work.} [3.4\% Bonus For All]
+
+    \begin{hintbox}
+        Since the noise has $\mathsf{Var}(\epsilon_{ij})=\sigma^2$ and zero mean, we can see: \begin{align*}
+            &\mathsf{Var}(\epsilon_{ij}) = \mathbb{E}[\epsilon_{ij}^2] - (\mathbb{E}[\epsilon_{ij}])^2 \\
+            &\sigma^2 = \mathbb{E}[\epsilon_{ij}^2] - 0^2 \\
+            &\mathbb{E}[\epsilon_{ij}\epsilon_{ij}] = \sigma^2
+        \end{align*}
+
+        Also, since the noise terms are i.i.d., we can say something about the product of different noise terms. \begin{align*}
+            \mathbb{E}[\epsilon_{ij}\epsilon_{mn}] &= \mathbb{E}[\epsilon_{ij}]\mathbb{E}[\epsilon_{mn}] \hspace{0.5cm}\text{ by the definition of independence, iff }i\neq m \lor j\neq n\\
+            \mathbb{E}[\epsilon_{ij}\epsilon_{mn}] &= 0\cdot 0=0
+        \end{align*}
+
+        Altogether, the expectation of the product of two noise terms is piecewise, depending on whether they are the same noise term.
+  $$
+  \mathbb{E}[\epsilon_\phi\epsilon_\psi]=\left\{
+  \begin{array}{rcl}
+  \sigma^2       &      & \phi = \psi\\
+  0     &      & \phi \neq \psi\\
+  \end{array} \right.
+  $$
+    \end{hintbox}
+\end{enumerate}

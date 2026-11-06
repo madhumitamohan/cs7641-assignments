@@ -24,7 +24,25 @@ class DBSCAN(object):
         If a point is unvisited or is a noise point (has fewer than the minimum number of neighbor points), then its cluster assignment should be -1.
         Set the first cluster as C = 0
         """
-        raise NotImplementedError
+        C = 0
+
+        N = len(self.dataset)
+        visitedIndices = set()
+        cluster_idx = np.full(N, -1, dtype=int)
+
+
+        for p_index in range(N):
+            if p_index in visitedIndices:
+                continue
+
+            visitedIndices.add(p_index)
+            neighbour_points = self.regionQuery(p_index)
+            
+            if len(neighbour_points) >= self.minPts:
+                self.expandCluster(p_index, neighbour_points, C, cluster_idx, visitedIndices)
+                C += 1
+
+        return cluster_idx
 
     def expandCluster(self, index, neighborIndices, C, cluster_idx, visitedIndices):
         """
@@ -42,7 +60,29 @@ class DBSCAN(object):
             1. np.concatenate(), and np.sort() may be helpful here. A while loop may be better than a for loop.
             2. Use, np.unique(), np.take() to ensure that you don't re-explore the same Indices. This way we avoid redundancy.
         """
-        raise NotImplementedError
+        cluster_idx[index] = C #add p to cluster C
+
+        worklist = list(neighborIndices)
+        queued = set(worklist)
+        cursor = 0
+
+        while cursor < len(worklist):
+            p_dash = worklist[cursor]
+            cursor += 1
+
+            if p_dash not in visitedIndices:
+                visitedIndices.add(p_dash)
+                neighbour_indices_dash = self.regionQuery(p_dash)
+
+                if len(neighbour_indices_dash) >= self.minPts:
+                    for neighbour in neighbour_indices_dash:
+                        if neighbour not in queued:
+                            worklist.append(neighbour)
+                            queued.add(neighbour)
+
+            if cluster_idx[p_dash] == -1:
+                cluster_idx[p_dash] = C        
+
 
     def regionQuery(self, pointIndex):
         """
@@ -56,4 +96,6 @@ class DBSCAN(object):
         Hint: pairwise_dist (implemented above) and np.argwhere may be helpful here
         Hint: make sure you are including P itself in the returned indices.
         """
-        raise NotImplementedError
+        distances = pairwise_dist(self.dataset[pointIndex: pointIndex + 1], self.dataset)[0] #(1,N)
+        region_points = np.where(distances <= self.eps)
+        return region_points[0]

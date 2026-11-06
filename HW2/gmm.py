@@ -288,7 +288,15 @@ def cluster_pixels_gmm(image, K, max_iters=10):
         np.clip() can be used to clip values in an array at a minimum and maximum.
         Also, remember you can call your GMM with the disable_tqdm=True kwarg to make it not spawn a tqdm bar if you'd like.
     """
-    raise NotImplementedError
+    flattened_image = image.reshape(-1, 3).astype(float)
+    gmm = GMM(flattened_image, K, max_iters)
+    tau, (pi, mu, sigma) = gmm(disable_tqdm=True)
+    labels = np.argmax(tau, axis=1)
+
+    reconstructed_image = np.rint(np.clip(mu[labels], 0, 255)).astype(np.uint8)
+
+    clustered_image = reconstructed_image.reshape(image.shape)
+    return clustered_image
 
 
 def image_frob_dist(image1, image2):
@@ -327,7 +335,15 @@ def density(points, pi, mu, sigma):
         You already did the normal distribution for a single Gaussian in the GMM class.
         You can just loop over the components K to compute the mixture.
     """
-    raise NotImplementedError
+    K = np.shape(pi)[0]
+
+    densities = np.zeros(np.shape(points)[0])
+
+    for k in range(K):
+        densities += pi[k] * GMM.multinormalPDF(points, mu[k], sigma[k])
+
+    return densities
+
 
 
 def rejection_sample(xmin, xmax, ymin, ymax, pi, mu, sigma, dmax=1.0):
@@ -352,4 +368,14 @@ def rejection_sample(xmin, xmax, ymin, ymax, pi, mu, sigma, dmax=1.0):
     Return:
         point: np.ndarray(1, 2), the x and y coordinates of the sampled datapoint
     """
-    raise NotImplementedError
+    while(True):
+        c = np.array([[np.random.uniform(xmin, xmax), np.random.uniform(ymin, ymax)]])
+
+        p_c = density(c, pi, mu, sigma)[0]
+
+        u = np.random.uniform(0.0, dmax)
+
+        if u <= p_c:
+            return c
+    
+
