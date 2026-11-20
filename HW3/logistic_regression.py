@@ -20,7 +20,7 @@ class LogisticRegression(object):
         Return:
             (N, D) numpy array, whose values are transformed by sigmoid function to the range (0, 1)
         """
-        raise NotImplementedError
+        return 1/(1+np.exp(-s))
 
     def bias_augment(self, x: np.ndarray) -> np.ndarray:
         """
@@ -31,7 +31,10 @@ class LogisticRegression(object):
         Returns:
             x_aug: (np.ndarray): (N, D + 1) numpy array, N data points each with a column of 1s and D features
         """
-        raise NotImplementedError
+        bias_array = np.ones((x.shape[0], 1))
+        x_aug = np.concatenate((bias_array, x), axis=1)
+        return x_aug
+
 
     def predict_probs(self, x_aug: np.ndarray, theta: np.ndarray) -> np.ndarray:
         """
@@ -45,7 +48,7 @@ class LogisticRegression(object):
             h_x (np.ndarray): (N, 1) numpy array, the predicted probabilities of each data point being the positive label
                 this result is h(x) = P(y = 1 | x)
         """
-        raise NotImplementedError
+        return self.sigmoid(x_aug @ theta)
 
     def predict_labels(self, h_x: np.ndarray, thresold: float) -> np.ndarray:
         """
@@ -59,7 +62,9 @@ class LogisticRegression(object):
             y_hat (np.ndarray): (N, 1) numpy array, the predicted labels of each data point
                 0 for negative label, 1 for positive label
         """
-        raise NotImplementedError
+        y_hat = np.where(h_x > thresold, 1, 0)
+        return y_hat
+
 
     def loss(self, y: np.ndarray, h_x: np.ndarray) -> float:
         """
@@ -72,7 +77,8 @@ class LogisticRegression(object):
         Returns:
             loss (float)
         """
-        raise NotImplementedError
+        return -np.sum(y * np.log(h_x) + (1-y) * np.log(1-h_x))/y.shape[0]
+        # return np.sum((h_x - y) ** 2)/y.shape[0]
 
     def gradient(self, x_aug: np.ndarray, y: np.ndarray, h_x: np.ndarray) -> np.ndarray:
         """
@@ -89,7 +95,7 @@ class LogisticRegression(object):
         Hints:
             Matrix multiplication takes care of the summation part of the definition.
         """
-        raise NotImplementedError
+        return x_aug.T @ (h_x - y)/y.shape[0]
 
     def accuracy(self, y: np.ndarray, y_hat: np.ndarray) -> float:
         """
@@ -101,7 +107,8 @@ class LogisticRegression(object):
         Returns:
             accuracy of the given parameters theta on data x, y
         """
-        raise NotImplementedError
+        matches = np.count_nonzero(y == y_hat)
+        return matches/y.shape[0]
 
     def evaluate(
         self, x: np.ndarray, y: np.ndarray, theta: np.ndarray, threshold: float
@@ -120,7 +127,12 @@ class LogisticRegression(object):
         Returns:
             Tuple[float, float]: loss, accuracy
         """
-        raise NotImplementedError
+        x_aug = self.bias_augment(x)
+        h_x = self.predict_probs(x_aug, theta)
+        y_hat = self.predict_labels(h_x, threshold)
+        loss = self.loss(y, h_x)
+        acc = self.accuracy(y, y_hat)
+        return (loss, acc)
 
     def fit(
         self,
@@ -159,7 +171,21 @@ class LogisticRegression(object):
         Return:
             theta: (D + 1, 1) numpy array, the parameters of the fitted/trained model
         """
-        raise NotImplementedError
+        D = x_train.shape[1]
+        theta = np.zeros((D+1, 1))
+        x_train_aug = self.bias_augment(x_train)
+        
+
+        for epoch in range(epochs):
+            h_x = self.predict_probs(x_train_aug, theta)
+            gradient_loss = self.gradient(x_train_aug, y_train, h_x)
+
+            theta = theta - (lr * gradient_loss)
+
+            if epoch % 100 == 0:
+                self.update_evaluation_lists(x_train, y_train, x_val, y_val, theta, epoch, threshold)
+
+        return theta
 
     def update_evaluation_lists(
         self,

@@ -28,7 +28,9 @@ class AudioCompression(object):
             Sigma is a diagonal matrix in the math, but there's no need to store all of those zeros.
             The return shape is 2d, 1 for the channels, 1 for a simple array of the singular values.
         """
-        raise NotImplementedError
+        u,s,vt = np.linalg.svd(X)
+        return u,s,vt
+
 
     def compress(
         self, U: np.ndarray, S: np.ndarray, Vt: np.ndarray, k: int
@@ -48,7 +50,11 @@ class AudioCompression(object):
                 S_comp: np.ndarray(C, k)
                 Vt_comp: np.ndarray(C, k, N)
         """
-        raise NotImplementedError
+        U_comp = U[:, :, :k]
+        S_comp = S[:, :k]
+        Vt_comp = Vt[:, :k, :]
+        return U_comp, S_comp, Vt_comp
+
 
     def rebuild_svd(
         self, U_comp: np.ndarray, S_comp: np.ndarray, Vt_comp: np.ndarray
@@ -64,8 +70,10 @@ class AudioCompression(object):
         Return:
             X_comp: np.ndarray(C,F,N)
         """
-        raise NotImplementedError
-
+        S_new = S_comp[:, np.newaxis, :]
+        X_rebuild = (U_comp * S_new) @ Vt_comp
+        return X_rebuild
+    
     def recovered_variance_proportion(
         self, S: np.ndarray, k: int
     ) -> Union[float, np.ndarray]:
@@ -80,7 +88,10 @@ class AudioCompression(object):
         Return:
             recovered_var: np.ndarray(C), the proportion of recovered variance for each channel
         """
-        raise NotImplementedError
+        total_var = np.sum(S ** 2, axis = 1)
+        top_k_var = np.sum(S[:, :k] ** 2, axis=1)
+
+        return top_k_var/total_var
 
     def memory_savings(self, X: np.ndarray, k: int) -> Tuple[int, int, int]:
         """

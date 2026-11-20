@@ -27,7 +27,10 @@ class PCAReduction(object):
             Sigma is a diagonal matrix, but there's no need to store all of those zeros.
             The return shape is 2d, 1 for the channels, 1 for a simple array of the singular values.
         """
-        raise NotImplementedError
+        feature_avg = np.mean(X, axis=0, keepdims=True)
+        centered_X = X - feature_avg
+        u,s,vt = np.linalg.svd(centered_X, full_matrices=False)
+        return u,s,vt
 
     def compute_principal_components(self, X: np.ndarray, k: int) -> np.ndarray:
         """
@@ -40,7 +43,9 @@ class PCAReduction(object):
         Return:
             components: (k, D) numpy array where each row represents a principal component.
         """
-        raise NotImplementedError
+        u,s,vt = self.svd(X)
+        return vt[:k, :]
+
 
     def project(self, data: np.ndarray, components: np.ndarray) -> np.ndarray:
         """
@@ -62,4 +67,5 @@ class PCAReduction(object):
         Note:
             While we won't check for looping, you may experience timeouts for slow solutions.
         """
-        raise NotImplementedError
+        centered_data = data - np.mean(data, axis = 0)
+        return centered_data @ components.T

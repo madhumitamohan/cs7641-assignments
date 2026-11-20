@@ -40,7 +40,9 @@ class BaseRegressor(ABC):
         Return:
             augmented_X: np.ndarray(N, 1+D), where the first feature is all ones
         """
-        raise NotImplementedError
+        bias_array = np.ones((X.shape[0], 1))
+        x_aug = np.concatenate((bias_array, X), axis=1)
+        return x_aug
 
     @staticmethod
     def rmse(y_predicted: np.ndarray, y_actual: np.ndarray) -> float:
@@ -53,7 +55,7 @@ class BaseRegressor(ABC):
         Return:
             rmse: float
         """
-        raise NotImplementedError
+        return np.sqrt(np.mean((y_predicted - y_actual) ** 2))
 
     @abstractmethod
     def fit(self, X: np.ndarray, y: np.ndarray):
@@ -122,7 +124,9 @@ class ClosedFormRegressor(BaseRegressor):
         Return:
             nothing
         """
-        raise NotImplementedError
+        if self.use_bias_term:
+            X = self._add_bias_term(X)
+        self.weights = np.linalg.pinv(X.T @ X) @ X.T @ y
 
 
 class GDRegressor(BaseRegressor):
@@ -164,7 +168,26 @@ class GDRegressor(BaseRegressor):
         Return:
             training_loss_per_epoch: list[float], the RMSE of the training data (X) per epoch
         """
-        raise NotImplementedError
+
+        if self.use_bias_term:
+            X = self._add_bias_term(X)
+
+        self.weights = np.zeros((X.shape[1], 1))
+        training_loss_per_epoch = []
+
+
+        for epoch in range(self.epochs):
+
+
+            gradient = (X.T @ (X @ self.weights - y))/ X.shape[0]
+            self.weights = self.weights - (self.lr * gradient)
+
+            
+            err = self.rmse(X @ self.weights, y)
+            training_loss_per_epoch.append(err)
+
+        return training_loss_per_epoch
+            
 
 
 class SGDRegressor(BaseRegressor):
@@ -208,7 +231,28 @@ class SGDRegressor(BaseRegressor):
         Return:
             training_loss_per_epoch: list[float], the RMSE of the training data (X) per epoch
         """
-        raise NotImplementedError
+        if self.use_bias_term:
+            X = self._add_bias_term(X)
+
+        self.weights = np.zeros((X.shape[1], 1))
+        training_loss_per_epoch = []
+
+
+        for epoch in range(self.epochs):
+            
+
+            for index in range(X.shape[0]):
+                x_i = X[index:index+1]
+                y_i = y[index:index+1]
+
+                gradient = (x_i.T @ (x_i @ self.weights - y_i))
+                self.weights = self.weights - (self.lr * gradient)
+
+            
+            err = self.rmse(X @ self.weights, y)
+            training_loss_per_epoch.append(err)
+
+        return training_loss_per_epoch
 
 
 class MBGDRegressor(BaseRegressor):
@@ -260,7 +304,28 @@ class MBGDRegressor(BaseRegressor):
         Return:
             training_loss_per_epoch: list[float], the RMSE of the training data (X) per epoch
         """
-        raise NotImplementedError
+        if self.use_bias_term:
+            X = self._add_bias_term(X)
+
+        self.weights = np.zeros((X.shape[1], 1))
+        training_loss_per_epoch = []
+
+
+        for epoch in range(self.epochs):
+            
+
+            for index in range(0, X.shape[0], self.batch_size):
+                x_i = X[index:index+self.batch_size]
+                y_i = y[index:index+self.batch_size]
+
+                gradient = (x_i.T @ (x_i @ self.weights - y_i))/self.batch_size
+                self.weights = self.weights - (self.lr * gradient)
+
+            
+            err = self.rmse(X @ self.weights, y)
+            training_loss_per_epoch.append(err)
+
+        return training_loss_per_epoch
 
 
 class ClosedFormRidgeRegressor(BaseRegressor):
@@ -295,7 +360,17 @@ class ClosedFormRidgeRegressor(BaseRegressor):
         Return:
             nothing
         """
-        raise NotImplementedError
+        if self.use_bias_term:
+            X = self._add_bias_term(X)
+            
+        D = X.shape[1]
+        I = np.identity(D)
+        if self.use_bias_term:
+            I[0,0] = 0.0
+        
+        inverse_term = ((X.T @ X) + (self.C * I))
+        inverse = np.linalg.inv(inverse_term)
+        self.weights = (inverse @ X.T) @ y 
 
 
 class GDRidgeRegressor(BaseRegressor):
@@ -344,7 +419,27 @@ class GDRidgeRegressor(BaseRegressor):
         Return:
             training_loss_per_epoch: list[float], the RMSE of the training data (X) per epoch
         """
-        raise NotImplementedError
+        if self.use_bias_term:
+            X = self._add_bias_term(X)
+
+        N = X.shape[0]
+        self.weights = np.zeros((X.shape[1], 1))
+        training_loss_per_epoch = []
+
+
+        for epoch in range(self.epochs):
+
+            reg_term = self.C * self.weights/N
+            reg_term[0] = 0.0
+            
+            gradient = reg_term + (X.T @ (X @ self.weights - y))/ X.shape[0]
+            self.weights = self.weights - (self.lr * gradient)
+
+            
+            err = self.rmse(X @ self.weights, y)
+            training_loss_per_epoch.append(err)
+
+        return training_loss_per_epoch
 
 
 class SGDRidgeRegressor(BaseRegressor):
@@ -399,8 +494,31 @@ class SGDRidgeRegressor(BaseRegressor):
         Return:
             training_loss_per_epoch: list[float], the RMSE of the training data (X) per epoch
         """
-        raise NotImplementedError
+        if self.use_bias_term:
+            X = self._add_bias_term(X)
 
+        self.weights = np.zeros((X.shape[1], 1))
+        training_loss_per_epoch = []
+
+
+        for epoch in range(self.epochs):
+            
+
+            for index in range(X.shape[0]):
+                x_i = X[index:index+1]
+                y_i = y[index:index+1]
+
+                reg_term = self.C * self.weights
+                reg_term[0] = 0.0
+
+                gradient = reg_term + (x_i.T @ (x_i @ self.weights - y_i))
+                self.weights = self.weights - (self.lr * gradient)
+
+            
+            err = self.rmse(X @ self.weights, y)
+            training_loss_per_epoch.append(err)
+
+        return training_loss_per_epoch
 
 class MBGDRidgeRegressor(BaseRegressor):
     def __init__(
@@ -456,4 +574,28 @@ class MBGDRidgeRegressor(BaseRegressor):
         Return:
             training_loss_per_epoch: list[float], the RMSE of the training data (X) per epoch
         """
-        raise NotImplementedError
+        if self.use_bias_term:
+            X = self._add_bias_term(X)
+
+        self.weights = np.zeros((X.shape[1], 1))
+        training_loss_per_epoch = []
+
+
+        for epoch in range(self.epochs):
+            
+
+            for index in range(0, X.shape[0], self.batch_size):
+                x_i = X[index:index+self.batch_size]
+                y_i = y[index:index+self.batch_size]
+
+                reg_term = self.C * self.weights/self.batch_size
+                reg_term[0] = 0.0
+
+                gradient = reg_term + (x_i.T @ (x_i @ self.weights - y_i))/self.batch_size
+                self.weights = self.weights - (self.lr * gradient)
+
+            
+            err = self.rmse(X @ self.weights, y)
+            training_loss_per_epoch.append(err)
+
+        return training_loss_per_epoch

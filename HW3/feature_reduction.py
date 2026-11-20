@@ -38,7 +38,35 @@ class FeatureReduction(object):
             - You can access the feature names using data.columns.tolist().
             - You can index into a Pandas dataframe using multiple column names at once in a list.
         """
-        raise NotImplementedError
+        best_features = []
+        remaining_features = list(data.columns)
+
+        while remaining_features:
+            best_candidate = None
+            min_pvalue = float("inf")
+
+            for feature in remaining_features:
+                test_features = best_features + [feature]
+
+                X_with_bias = sm.add_constant(data[test_features])
+                model = sm.OLS(target, X_with_bias).fit()
+
+                p_val = model.pvalues[feature]
+
+                if p_val < min_pvalue:
+                    min_pvalue = p_val
+                    best_candidate = feature
+
+
+
+            if min_pvalue < significance_level:
+                best_features.append(best_candidate)
+                remaining_features.remove(best_candidate)
+            else:
+                break
+
+
+        return best_features
 
     def evaluate_features(data: pd.DataFrame, y: pd.Series, features: list) -> None:
         """

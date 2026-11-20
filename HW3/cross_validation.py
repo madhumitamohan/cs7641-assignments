@@ -23,7 +23,11 @@ class CrossValidation:
             While faster numpy-centric implementations are possible, a simple Python set-based approach is sufficient for this task.
             For an extra challenge, look into np.intersect1d and np.ascontiguousarray for a more efficient implementation.
         """
-        raise NotImplementedError
+        intersect = np.intersect1d(X_train, X_valid)
+        if intersect is not None and intersect.size > 0:
+            return True
+        else:
+            return False
 
     def cross_validation(
         self,
@@ -55,7 +59,26 @@ class CrossValidation:
             Use the model like a black box! Don't go look at LeNet unless you want to,
               but this can be completed by just calling self.fit_model and self.evaluate_model
         """
-        raise NotImplementedError
+        no_of_datapoints = X.shape[0]
+        partitioned_indices = np.array_split(range(no_of_datapoints), kfold)
+
+        accuracy_list = []
+
+        for active_fold_indices in partitioned_indices:
+            active_fold = X[active_fold_indices]
+            active_fold_labels = y[active_fold_indices]
+
+            inactive_mask = np.ones(no_of_datapoints, dtype=bool)
+            inactive_mask[active_fold_indices] = False
+            inactive_fold = X[inactive_mask]
+            inactive_fold_labels = y[inactive_mask]
+
+            model = self.fit_model(inactive_fold, inactive_fold_labels, hyperparameter)
+            accuracy = self.evaluate_model(model, active_fold, active_fold_labels)
+
+            accuracy_list.append(accuracy)
+
+        return accuracy_list
 
     def hyperparameter_search(
         self, X: np.ndarray, y: np.ndarray, hyperparameters: List[float], kfold: int
